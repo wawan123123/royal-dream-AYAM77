@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Top-Up Royal Dream</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+            padding: 20px;
+        }
+        .container {
+            background: white;
+            padding: 20px;
+            max-width: 90%;
+            margin: auto;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button, select {
+            width: 100%;
+            margin: 10px 0;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        button {
+            background: #28a745;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #218838;
+        }
+        .hidden {
+            display: none;
+        }
+        .payment-info {
+            margin-top: 10px;
+            font-size: 18px;
+            font-weight: bold;
+        }
+        .copy-btn {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 5px;
+        }
+        .alert-text {
+            color: red;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Top-Up Royal Dream</h2>
+        
+        <form id="topupForm" onsubmit="event.preventDefault(); showPaymentOptions();">
+            <input type="text" id="userId" placeholder="Masukkan ID Pengguna" required>
+            <input type="text" id="nominal" placeholder="Masukkan jumlah (contoh: 200M, 2B, dll.)" required>
+            <button type="submit">Beli Sekarang</button>
+        </form>
+
+        <div id="paymentOptions" class="hidden">
+            <h3>Pilih Metode Pembayaran</h3>
+            <select id="paymentMethod" onchange="showPaymentDetails()">
+                <option value="qris">QRIS</option>
+                <option value="ovo">OVO</option>
+                <option value="seabank">Seabank</option>
+                <option value="bri">BRI</option>
+                <option value="gopay">GoPay</option>
+            </select>
+
+            <p id="paymentInfo" class="payment-info hidden"></p>
+            <button id="copyBtn" class="copy-btn hidden" onclick="copyToClipboard()">Salin</button>
+            
+            <p class="alert-text hidden" id="alertMessage">Jika sudah melakukan pembayaran, kirim bukti ke WhatsApp!</p>
+            
+            <button onclick="sendToWhatsApp()">Konfirmasi & Kirim ke WhatsApp</button>
+        </div>
+    </div>
+
+    <script>
+        function showPaymentOptions() {
+            document.getElementById("paymentOptions").classList.remove("hidden");
+        }
+
+        function showPaymentDetails() {
+            let paymentMethod = document.getElementById("paymentMethod").value;
+            let paymentInfo = document.getElementById("paymentInfo");
+            let copyBtn = document.getElementById("copyBtn");
+            let alertMessage = document.getElementById("alertMessage");
+
+            let paymentDetails = {
+                ovo: { number: "085172227247", name: "Mega Islelawati" },
+                seabank: { number: "901819884670", name: "Mega Islelawati" },
+                bri: { number: "1861612133", name: "Mega Islelawati" },
+                gopay: { number: "085172227247", name: "Mega Islelawati" }
+            };
+
+            if (paymentMethod === "qris") {
+                paymentInfo.classList.add("hidden");
+                copyBtn.classList.add("hidden");
+            } else {
+                paymentInfo.classList.remove("hidden");
+                copyBtn.classList.remove("hidden");
+                
+                let account = paymentDetails[paymentMethod];
+                if (account) {
+                    paymentInfo.innerHTML = `<strong>${account.number}</strong> - ${account.name}`;
+                    copyBtn.setAttribute("data-number", account.number);
+                }
+            }
+
+            alertMessage.classList.remove("hidden");
+        }
+
+        function copyToClipboard() {
+            let number = document.getElementById("copyBtn").getAttribute("data-number");
+            navigator.clipboard.writeText(number).then(() => {
+                alert("Nomor berhasil disalin!");
+            });
+        }
+
+        function sendToWhatsApp() {
+            let userId = document.getElementById("userId").value;
+            let nominal = document.getElementById("nominal").value;
+            let paymentMethod = document.getElementById("paymentMethod").value;
+            let phoneNumber = "6285169979469"; // Nomor WhatsApp admin
+
+            if (userId === "" || nominal === "") {
+                alert("Harap isi semua data!");
+                return;
+            }
+
+            let message = `Halo, saya ingin top-up Royal Dream.\n\n🆔 ID Pengguna: ${userId}\n💰 Nominal: ${nominal}\n💳 Metode Pembayaran: ${paymentMethod}\n\nMohon konfirmasi. Terima kasih!`;
+            let encodedMessage = encodeURIComponent(message);
+            let whatsappURL = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+
+            window.open(whatsappURL, "_blank");
+        }
+    </script>
+</body>
+</html>
